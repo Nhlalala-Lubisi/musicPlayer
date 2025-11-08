@@ -4,3 +4,4 @@ whitenoise
 psycopg2-binary
 requests
 python-decouple
+Pillow>=10.0.0
