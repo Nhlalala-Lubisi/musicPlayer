@@ -1,0 +1,71 @@
+<!-- main.html update -->
+{% load static %}
+
+<div class="music-player">
+    <!-- Search bar at the top -->
+    <div class="player-nav">
+        <form method="GET" action="{% url 'Music:search_song' %}" class="search-form-large">
+            <input type="text" name="q" placeholder="Search for songs" value="{{ query }}">
+            <button type="submit"><i class="fa fa-search"></i> Search</button>
+        </form>
+    </div>
+
+    {% for item in page_obj %}
+    <!-- Cover -->
+    <div class="cover">
+        <img src="{% if item.get_image_url %}{{ item.get_image_url }}{% else %}{% static 'images/default-cover.jpg' %}{% endif %}" alt="{{ item.title }} cover" />
+    </div>
+
+    <!-- Song Info -->
+    <div class="tile">
+        <h3>{{ item.artist }}</h3>
+        <h1>{{ item.title }}</h1>
+        {% if item.album %}<p>Album: {{ item.album }}</p>{% endif %}
+    </div>
+
+    <!-- Hidden Audio Player -->
+    <audio id="audio-player">
+        <source src="{% if item.preview_url %}{{ item.preview_url }}{% elif item.audio_file %}{{ item.audio_file.url }}{% else %}{{ item.audio_link }}{% endif %}" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Custom Controls -->
+    <div class="custom-controls">
+        <a href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% endif %}" class="btn">
+            <i class="fa fa-step-backward"></i>
+        </a>
+        <button id="play" class="btn-play"><i class="fa fa-play"></i></button>
+        <a href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% endif %}" class="btn">
+            <i class="fa fa-step-forward"></i>
+        </a>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress"></div>
+    </div>
+    <div class="time-display">
+        <span class="current-time">0:00</span>
+        <span class="duration">{{ item.duration|default:"0:00" }}</span>
+    </div>
+
+    <!-- Volume -->
+    <div class="volume-container">
+        <i class="fa fa-volume-up"></i>
+        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="80">
+    </div>
+
+    <!-- Lyrics -->
+    <div class="lyrics-container">
+        <h2>Lyrics</h2>
+        <div id="lyrics" data-lyrics="{{ item.lyrics|default:'' }}"></div>
+    </div>
+    {% empty %}
+    <div class="no-songs">
+        <h2>No songs in your library yet</h2>
+        <p>Use the search bar above to find songs on Deezer and add them to your library.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="{% static 'js/script.js' %}"></script>

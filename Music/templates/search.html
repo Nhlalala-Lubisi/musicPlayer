@@ -1,0 +1,50 @@
+<!-- search.html update -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Songs - Music Player</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="search-container">
+        <div class="search-header">
+            <h1>Search Songs</h1>
+            <form method="GET" action="{% url 'Music:search_song' %}" class="search-form-large">
+                <input type="text" name="q" placeholder="Search for songs" value="{{ query }}">
+                <button type="submit"><i class="fa fa-search"></i> Search</button>
+            </form>
+            <a href="{% url 'Music:index' %}" class="back-btn"><i class="fa fa-arrow-left"></i> Back to Player</a>
+        </div>
+
+        <div class="search-results">
+            {% if results %}
+                <h2>Search Results</h2>
+                <div class="results-grid">
+                    {% for track in results %}
+                        <div class="track-card">
+                            <img src="{{ track.album.cover_medium }}" alt="{{ track.album.title }}">
+                            <div class="track-info">
+                                <h3>{{ track.title }}</h3>
+                                <p>{{ track.artist.name }}</p>
+                                <p>Album: {{ track.album.title }}</p>
+                                <p>Duration: {{ track.duration|divisibleby:60|yesno:"%M:%S,%S" }}</p>
+                            </div>
+                            <form method="POST" action="{% url 'Music:add_song' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="deezer_id" value="{{ track.id }}">
+                                <button type="submit" class="add-btn">Add to Library</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elif query %}
+                <p>No results found for "{{ query }}"</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
